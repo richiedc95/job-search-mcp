@@ -1,0 +1,26 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.richiedc95/job-search",
+  "title": "Job Search: 25,500+ career sites",
+  "description": "Newest jobs from 25,500+ company career sites: Greenhouse, Lever, Workday and more.",
+  "version": "1.0.0",
+  "repository": {
+    "url": "https://github.com/richiedc95/job-search-mcp",
+    "source": "github"
+  },
+  "websiteUrl": "https://apify.com/richiedc95/job-search-api",
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://mcp.apify.com?tools=richiedc95/job-search-api",
+      "headers": [
+        {
+          "name": "Authorization",
+          "description": "Bearer <your Apify API token>. Optional: clients that support OAuth can sign in to Apify instead.",
+          "isRequired": false,
+          "isSecret": true
+        }
+      ]
+    }
+  ]
+}
