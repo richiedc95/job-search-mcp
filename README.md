@@ -108,6 +108,15 @@ for job in client.dataset(run["defaultDatasetId"]).iterate_items():
     print(job["postedAt"], job["title"], job["company"], job["url"])
 ```
 
+### No-code: n8n, Make and Zapier
+
+Get daily job alerts in Slack, Google Sheets or email without writing code.
+
+- **n8n:** import a ready-made workflow from [`examples/`](examples/):
+  - [daily alerts with every filter, each job sent once](examples/n8n-daily-job-alerts-slack.json);
+  - [a plain-language daily digest](examples/n8n-job-search-api-slack.json).
+- **Make and Zapier:** step-by-step scenarios with the official Apify app are in [examples/README.md](examples/README.md).
+
 ## How it works
 
 - A directory of 25,500+ companies and their job boards is built from public sources and refreshed regularly.

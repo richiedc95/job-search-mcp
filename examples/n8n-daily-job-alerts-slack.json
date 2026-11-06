@@ -1,0 +1,62 @@
+{
+  "name": "Daily job alerts from 25,500+ career sites (Apify Job Search -> Slack)",
+  "nodes": [
+    {
+      "id": "6f1c2a10-0001-4a6e-9c1d-1a2b3c4d5e01",
+      "name": "Every morning",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 0],
+      "parameters": {
+        "rule": { "interval": [{ "field": "days", "triggerAtHour": 8 }] }
+      }
+    },
+    {
+      "id": "6f1c2a10-0002-4a6e-9c1d-1a2b3c4d5e02",
+      "name": "Search new jobs (Apify)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [240, 0],
+      "notes": "Credential: Header Auth with Name = Authorization and Value = Bearer <your Apify API token> (Apify Console > Settings > API & Integrations). onlyNewJobs returns only jobs that earlier runs did not return, so each job is posted once.",
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.apify.com/v2/acts/richiedc95~company-jobs-search/run-sync-get-dataset-items",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"keywords\": [\"data engineer\", \"analytics engineer\"],\n  \"locations\": [\"remote\", \"london\"],\n  \"postedWithinDays\": 1,\n  \"onlyNewJobs\": true,\n  \"descriptionFormat\": \"none\",\n  \"maxItems\": 50\n}",
+        "options": { "timeout": 300000 }
+      }
+    },
+    {
+      "id": "6f1c2a10-0003-4a6e-9c1d-1a2b3c4d5e03",
+      "name": "Is it a job?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [480, 0],
+      "parameters": {
+        "conditions": { "string": [{ "value1": "={{ $json.title }}", "operation": "isNotEmpty" }] }
+      }
+    },
+    {
+      "id": "6f1c2a10-0004-4a6e-9c1d-1a2b3c4d5e04",
+      "name": "Post to Slack",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.2,
+      "position": [720, -80],
+      "parameters": {
+        "select": "channel",
+        "channelId": { "__rl": true, "value": "#job-alerts", "mode": "name" },
+        "text": "=*{{ $json.title }}* at {{ $json.company }}\n{{ $json.location }}{{ $json.salaryMax ? ' · up to ' + $json.salaryMax + ' ' + ($json.salaryCurrency || '') : '' }}\n{{ $json.applyUrl || $json.url }}",
+        "otherOptions": {}
+      }
+    }
+  ],
+  "connections": {
+    "Every morning": { "main": [[{ "node": "Search new jobs (Apify)", "type": "main", "index": 0 }]] },
+    "Search new jobs (Apify)": { "main": [[{ "node": "Is it a job?", "type": "main", "index": 0 }]] },
+    "Is it a job?": { "main": [[{ "node": "Post to Slack", "type": "main", "index": 0 }], []] }
+  },
+  "settings": { "executionOrder": "v1" }
+}
